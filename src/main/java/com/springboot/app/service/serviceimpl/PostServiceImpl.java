@@ -3,8 +3,13 @@ package com.springboot.app.service.serviceimpl;
 import com.springboot.app.entity.Post;
 import com.springboot.app.exception.ResourceNotFound;
 import com.springboot.app.payload.PostDto;
+import com.springboot.app.payload.PostResponse;
 import com.springboot.app.repository.PostRepository;
 import com.springboot.app.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,16 +52,38 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
+    public PostResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir) {
 
-        List<Post> posts = postRepository.findAll();
-
-        List<PostDto> postDtos=new ArrayList<>();
-
-        postDtos = posts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
 
-        return postDtos;
+        //create instance of pageable
+
+//        Pageable pageable= PageRequest.of(pageNo,pageSize);
+
+        Pageable pageable= PageRequest.of(pageNo,pageSize, sort);
+
+
+//        List<Post> posts = postRepository.findAll();
+
+        Page<Post> page = postRepository.findAll(pageable);
+        List<Post> posts = page.getContent();
+
+//        List<PostDto> postDtos=new ArrayList<>();
+
+        List<PostDto> contents= posts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
+
+        PostResponse postResponse=new PostResponse();
+        postResponse.setContent(contents);
+        postResponse.setPageNo(page.getNumber());
+        postResponse.setPageSize(page.getSize());
+        postResponse.setTotalElements(page.getTotalElements());
+        postResponse.setTotalPages(page.getTotalPages());
+        postResponse.setLast(page.isLast());
+        return postResponse;
+
     }
 
     @Override

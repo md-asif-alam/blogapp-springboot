@@ -2,7 +2,9 @@ package com.springboot.app.controller;
 
 
 import com.springboot.app.payload.PostDto;
+import com.springboot.app.payload.PostResponse;
 import com.springboot.app.service.PostService;
+import com.springboot.app.utils.AppConstant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +28,13 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostDto>> getAllPosts(){
-       return new ResponseEntity<>(postService.getAllPosts(),HttpStatus.OK);
+    public ResponseEntity<PostResponse> getAllPosts(
+            @RequestParam(value = "pageNo",defaultValue = AppConstant.DEFAULT_PAGE_NUMBER,required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir",defaultValue = AppConstant.DEFAULT_SORT_DIR,required = false) String sortDir
+    ){
+       return new ResponseEntity<>(postService.getAllPosts(pageNo,pageSize,sortBy,sortDir),HttpStatus.OK);
     }
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable("id") Long id){
