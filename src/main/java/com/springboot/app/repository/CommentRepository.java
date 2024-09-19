@@ -1,0 +1,7 @@
+package com.springboot.app.repository;
+
+import com.springboot.app.entity.Comment;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CommentRepository extends JpaRepository<Comment,Long> {
+}
